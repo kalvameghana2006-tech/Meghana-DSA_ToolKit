@@ -1,4 +1,4 @@
-# Java Competitive Programming Template
+# Java Competitive Programming ToolKit
 
 Java template containing commonly used algorithms, data structures, and helper functions for faster implementation during coding contests.
 
