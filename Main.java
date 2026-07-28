@@ -116,19 +116,162 @@ class Main{
         private long q(int node, int s, int e, int l, int r) { if (r < s || e < l) return 0; if (l <= s && e <= r) return t[node]; int m = (s + e) / 2; return q(2 * node + 1, s, m, l, r) + q(2 * node + 2, m + 1, e, l, r); }
     }
 
-    // Math Utilities (Class: Mth)
-    static class Mth {
-        // Purpose: Compute Greatest Common Divisor | Input: long firstNum, long secondNum | Output: long
-        public static long gcd(long a, long b) { long res = b == 0 ? a : gcd(b, a % b); DBG.log("Mth.gcd (" + a + "," + b + ")", res); return res; }
-        // Purpose: Compute Least Common Multiple | Input: long firstNum, long secondNum | Output: long
-        public static long lcm(long a, long b) { long res = (a / gcd(a, b)) * b; DBG.log("Mth.lcm (" + a + "," + b + ")", res); return res; }
-        // Purpose: Compute modular exponentiation (base^exp % mod) | Input: long baseNum, long exponent, long modulo | Output: long
-        public static long pow(long b, long e, long m) { long res = 1, origB = b, origE = e; b %= m; while (e > 0) { if ((e & 1) == 1) res = (res * b) % m; b = (b * b) % m; e >>= 1; } DBG.log("Mth.pow (" + origB + "^" + origE + "%" + m + ")", res); return res; }
-        // Purpose: Test primality in O(sqrt(N)) | Input: long number | Output: boolean
-        public static boolean prime(long n) { if (n <= 1) { DBG.log("Mth.prime (" + n + ")", false); return false; } if (n <= 3) { DBG.log("Mth.prime (" + n + ")", true); return true; } if (n % 2 == 0 || n % 3 == 0) { DBG.log("Mth.prime (" + n + ")", false); return false; } for (long k = 5; k * k <= n; k += 6) if (n % k == 0 || n % (k + 2) == 0) { DBG.log("Mth.prime (" + n + ")", false); return false; } DBG.log("Mth.prime (" + n + ")", true); return true; }
-        // Purpose: Generate prime table using Sieve of Eratosthenes | Input: int maxLimit | Output: boolean[]
-        public static boolean[] sieve(int n) { boolean[] isP = new boolean[n + 1]; Arrays.fill(isP, true); if (n >= 0) isP[0] = false; if (n >= 1) isP[1] = false; for (int p = 2; p * p <= n; p++) if (isP[p]) for (int k = p * p; k <= n; k += p) isP[k] = false; DBG.msg("Mth.sieve Completed for N=" + n); return isP; }
+    // Math & Number Theory Utilities
+static class Mth {
+
+    // Purpose: Compute Greatest Common Divisor
+    // Input: long a, long b
+    // Output: long
+    public static long gcd(long a, long b) {
+        return b == 0 ? a : gcd(b, a % b);
     }
+
+    // Purpose: Compute Least Common Multiple
+    // Input: long a, long b
+    // Output: long
+    public static long lcm(long a, long b) {
+        return (a / gcd(a, b)) * b;
+    }
+
+    // Purpose: Fast Modular Exponentiation
+    // Input: long base, long exponent, long mod
+    // Output: long
+    public static long pow(long b, long e, long mod) {
+        long res = 1;
+        b %= mod;
+
+        while (e > 0) {
+            if ((e & 1) == 1)
+                res = (res * b) % mod;
+
+            b = (b * b) % mod;
+            e >>= 1;
+        }
+
+        return res;
+    }
+
+    // Purpose: Check whether a number is prime
+    // Input: int number
+    // Output: boolean
+    public static boolean isPrime(int n) {
+        if (n < 2) return false;
+        if (n == 2 || n == 3) return true;
+        if (n % 2 == 0) return false;
+
+        for (int i = 3; i * i <= n; i += 2)
+            if (n % i == 0)
+                return false;
+
+        return true;
+    }
+
+    // Purpose: Generate Prime Table (Sieve of Eratosthenes)
+    // Input: int limit
+    // Output: boolean[]
+    public static boolean[] sieve(int n) {
+        boolean[] prime = new boolean[n + 1];
+        Arrays.fill(prime, true);
+
+        if (n >= 0) prime[0] = false;
+        if (n >= 1) prime[1] = false;
+
+        for (int i = 2; i * i <= n; i++)
+            if (prime[i])
+                for (int j = i * i; j <= n; j += i)
+                    prime[j] = false;
+
+        return prime;
+    }
+
+    // Purpose: Smallest Prime Factor (SPF)
+    // Input: int limit
+    // Output: int[]
+    public static int[] spf(int n) {
+        int[] spf = new int[n + 1];
+
+        for (int i = 0; i <= n; i++)
+            spf[i] = i;
+
+        for (int i = 2; i * i <= n; i++) {
+            if (spf[i] == i) {
+                for (int j = i * i; j <= n; j += i)
+                    if (spf[j] == j)
+                        spf[j] = i;
+            }
+        }
+
+        return spf;
+    }
+
+    // Purpose: Prime Factorization using SPF
+    // Input: int number, int[] spf
+    // Output: ArrayList<Integer>
+    public static ArrayList<Integer> primeFactors(int n, int[] spf) {
+        ArrayList<Integer> ans = new ArrayList<>();
+
+        while (n > 1) {
+            ans.add(spf[n]);
+            n /= spf[n];
+        }
+
+        return ans;
+    }
+
+    // Purpose: Precompute Factorials modulo mod
+    // Input: int limit, int mod
+    // Output: long[]
+    public static long[] fact(int n, int mod) {
+        long[] fact = new long[n + 1];
+        fact[0] = 1;
+
+        for (int i = 1; i <= n; i++)
+            fact[i] = (fact[i - 1] * i) % mod;
+
+        return fact;
+    }
+
+    // Purpose: Modular Inverse (mod must be prime)
+    // Input: long number, int mod
+    // Output: long
+    public static long modInv(long a, int mod) {
+        return pow(a, mod - 2, mod);
+    }
+
+    // Purpose: Compute nCr modulo mod
+    // Input: int n, int r, int mod, long[] factorial
+    // Output: long
+    public static long nCr(int n, int r, int mod, long[] fact) {
+        if (r < 0 || r > n)
+            return 0;
+
+        long num = fact[n];
+        long den = (fact[r] * fact[n - r]) % mod;
+
+        return (num * modInv(den, mod)) % mod;
+    }
+
+    // Purpose: Euler's Totient Function
+    // Input: int number
+    // Output: int
+    public static int phi(int n) {
+        int res = n;
+
+        for (int i = 2; i * i <= n; i++) {
+            if (n % i == 0) {
+                while (n % i == 0)
+                    n /= i;
+
+                res -= res / i;
+            }
+        }
+
+        if (n > 1)
+            res -= res / n;
+
+        return res;
+    }
+}
 
     // Array Binary Search & Prefix/Suffix Utilities (Class: Arr)
     static class Arr {
@@ -188,7 +331,469 @@ class Main{
         // Purpose: Generate bitmask with lowest n bits set | Input: int bitCount | Output: int
         public static int mask(int n) { int res = (1 << n) - 1; DBG.log("Bit.mask (" + n + ")", res); return res; }
     }
+        // Graph Utilities (Adjacency List)
+    static class Gr {
 
+        // Purpose: Perform Depth First Search (DFS) Traversal
+        // Input: ArrayList<ArrayList<Integer>> graph, int startVertex
+        // Output: ArrayList<Integer> traversalOrder
+        public static ArrayList<Integer> dfs(ArrayList<ArrayList<Integer>> g, int src) {
+            int n = g.size();
+            boolean[] vis = new boolean[n];
+            ArrayList<Integer> ans = new ArrayList<>();
+            dfsUtil(src, g, vis, ans);
+            return ans;
+        }
+
+        // Purpose: DFS Helper Function
+        // Input: currentVertex, graph, visitedArray, answerList
+        // Output: None
+        private static void dfsUtil(int u, ArrayList<ArrayList<Integer>> g, boolean[] vis, ArrayList<Integer> ans) {
+            vis[u] = true;
+            ans.add(u);
+
+            for (int v : g.get(u)) {
+                if (!vis[v]) dfsUtil(v, g, vis, ans);
+            }
+        }
+
+        // Purpose: Perform Breadth First Search (BFS) Traversal
+        // Input: ArrayList<ArrayList<Integer>> graph, int startVertex
+        // Output: ArrayList<Integer> traversalOrder
+        public static ArrayList<Integer> bfs(ArrayList<ArrayList<Integer>> g, int src) {
+            int n = g.size();
+            boolean[] vis = new boolean[n];
+            Queue<Integer> q = new LinkedList<>();
+            ArrayList<Integer> ans = new ArrayList<>();
+
+            q.offer(src);
+            vis[src] = true;
+
+            while (!q.isEmpty()) {
+                int u = q.poll();
+                ans.add(u);
+
+                for (int v : g.get(u)) {
+                    if (!vis[v]) {
+                        vis[v] = true;
+                        q.offer(v);
+                    }
+                }
+            }
+
+            return ans;
+        }
+                // Purpose: Perform Topological Sort using DFS
+        // Input: ArrayList<ArrayList<Integer>> graph
+        // Output: ArrayList<Integer> topologicalOrder
+        public static ArrayList<Integer> topoDFS(ArrayList<ArrayList<Integer>> g) {
+            int n = g.size();
+            boolean[] vis = new boolean[n];
+            Stack<Integer> st = new Stack<>();
+
+            for (int i = 0; i < n; i++)
+                if (!vis[i])
+                    topoDFSUtil(i, g, vis, st);
+
+            ArrayList<Integer> ans = new ArrayList<>();
+            while (!st.isEmpty())
+                ans.add(st.pop());
+
+            return ans;
+        }
+
+        // Purpose: Topological Sort DFS Helper
+        // Input: currentVertex, graph, visitedArray, stack
+        // Output: None
+        private static void topoDFSUtil(int u, ArrayList<ArrayList<Integer>> g, boolean[] vis, Stack<Integer> st) {
+            vis[u] = true;
+
+            for (int v : g.get(u))
+                if (!vis[v])
+                    topoDFSUtil(v, g, vis, st);
+
+            st.push(u);
+        }
+
+        // Purpose: Perform Topological Sort using Kahn's Algorithm (BFS)
+        // Input: ArrayList<ArrayList<Integer>> graph
+        // Output: ArrayList<Integer> topologicalOrder
+        public static ArrayList<Integer> topoKahn(ArrayList<ArrayList<Integer>> g) {
+            int n = g.size();
+            int[] indegree = new int[n];
+
+            for (int i = 0; i < n; i++)
+                for (int v : g.get(i))
+                    indegree[v]++;
+
+            Queue<Integer> q = new LinkedList<>();
+            for (int i = 0; i < n; i++)
+                if (indegree[i] == 0)
+                    q.offer(i);
+
+            ArrayList<Integer> ans = new ArrayList<>();
+
+            while (!q.isEmpty()) {
+                int u = q.poll();
+                ans.add(u);
+
+                for (int v : g.get(u)) {
+                    indegree[v]--;
+                    if (indegree[v] == 0)
+                        q.offer(v);
+                }
+            }
+
+            return ans;
+        }
+                // Purpose: Find shortest distance from source using Dijkstra's Algorithm
+        // Input: ArrayList<ArrayList<int[]>> graph (neighbor, weight), int source
+        // Output: int[] shortestDistances
+        public static int[] dijkstra(ArrayList<ArrayList<int[]>> g, int src) {
+            int n = g.size();
+            int[] dist = new int[n];
+            Arrays.fill(dist, Integer.MAX_VALUE);
+
+            PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> Integer.compare(a[1], b[1]));
+
+            dist[src] = 0;
+            pq.offer(new int[]{src, 0});
+
+            while (!pq.isEmpty()) {
+                int[] cur = pq.poll();
+                int u = cur[0];
+                int d = cur[1];
+
+                if (d > dist[u]) continue;
+
+                for (int[] edge : g.get(u)) {
+                    int v = edge[0];
+                    int wt = edge[1];
+
+                    if (dist[u] + wt < dist[v]) {
+                        dist[v] = dist[u] + wt;
+                        pq.offer(new int[]{v, dist[v]});
+                    }
+                }
+            }
+
+            return dist;
+        }
+        
+    }
+        // Binary Tree Utilities
+    static class Tree {
+
+        // Tree Node
+        static class TreeNode {
+            int val;
+            TreeNode left, right;
+
+            TreeNode(int val) {
+                this.val = val;
+            }
+        }
+
+        // -------------------- TRAVERSALS --------------------
+
+        // Purpose: Perform Inorder Traversal (Left -> Root -> Right)
+        // Input: TreeNode root
+        // Output: ArrayList<Integer>
+        public static ArrayList<Integer> inorder(TreeNode root) {
+            ArrayList<Integer> ans = new ArrayList<>();
+            inorderUtil(root, ans);
+            return ans;
+        }
+
+        private static void inorderUtil(TreeNode root, ArrayList<Integer> ans) {
+            if (root == null) return;
+            inorderUtil(root.left, ans);
+            ans.add(root.val);
+            inorderUtil(root.right, ans);
+        }
+
+        // Purpose: Perform Preorder Traversal (Root -> Left -> Right)
+        // Input: TreeNode root
+        // Output: ArrayList<Integer>
+        public static ArrayList<Integer> preorder(TreeNode root) {
+            ArrayList<Integer> ans = new ArrayList<>();
+            preorderUtil(root, ans);
+            return ans;
+        }
+
+        private static void preorderUtil(TreeNode root, ArrayList<Integer> ans) {
+            if (root == null) return;
+            ans.add(root.val);
+            preorderUtil(root.left, ans);
+            preorderUtil(root.right, ans);
+        }
+
+        // Purpose: Perform Postorder Traversal (Left -> Right -> Root)
+        // Input: TreeNode root
+        // Output: ArrayList<Integer>
+        public static ArrayList<Integer> postorder(TreeNode root) {
+            ArrayList<Integer> ans = new ArrayList<>();
+            postorderUtil(root, ans);
+            return ans;
+        }
+
+        private static void postorderUtil(TreeNode root, ArrayList<Integer> ans) {
+            if (root == null) return;
+            postorderUtil(root.left, ans);
+            postorderUtil(root.right, ans);
+            ans.add(root.val);
+        }
+
+        // Purpose: Perform Level Order Traversal
+        // Input: TreeNode root
+        // Output: ArrayList<Integer>
+        public static ArrayList<Integer> levelOrder(TreeNode root) {
+            ArrayList<Integer> ans = new ArrayList<>();
+            if (root == null) return ans;
+
+            Queue<TreeNode> q = new LinkedList<>();
+            q.offer(root);
+
+            while (!q.isEmpty()) {
+                TreeNode cur = q.poll();
+                ans.add(cur.val);
+
+                if (cur.left != null) q.offer(cur.left);
+                if (cur.right != null) q.offer(cur.right);
+            }
+
+            return ans;
+        }
+
+        // -------------------- BASIC OPERATIONS --------------------
+
+        // Purpose: Find Height of Binary Tree
+        // Input: TreeNode root
+        // Output: int
+        public static int height(TreeNode root) {
+            if (root == null) return 0;
+            return 1 + Math.max(height(root.left), height(root.right));
+        }
+
+        // Purpose: Count Total Nodes
+        // Input: TreeNode root
+        // Output: int
+        public static int countNodes(TreeNode root) {
+            if (root == null) return 0;
+            return 1 + countNodes(root.left) + countNodes(root.right);
+        }
+
+        // Purpose: Count Leaf Nodes
+        // Input: TreeNode root
+        // Output: int
+        public static int countLeaves(TreeNode root) {
+            if (root == null) return 0;
+            if (root.left == null && root.right == null) return 1;
+            return countLeaves(root.left) + countLeaves(root.right);
+        }
+
+        // Purpose: Find Maximum Value in Tree
+        // Input: TreeNode root
+        // Output: int
+        public static int max(TreeNode root) {
+            if (root == null) return Integer.MIN_VALUE;
+            return Math.max(root.val, Math.max(max(root.left), max(root.right)));
+        }
+
+        // Purpose: Find Minimum Value in Tree
+        // Input: TreeNode root
+        // Output: int
+        public static int min(TreeNode root) {
+            if (root == null) return Integer.MAX_VALUE;
+            return Math.min(root.val, Math.min(min(root.left), min(root.right)));
+        }
+    }
+
+// String Utilities
+static class Str {
+
+    // Purpose: Reverse a String
+    // Input: String
+    // Output: String
+    public static String reverse(String s) {
+        return new StringBuilder(s).reverse().toString();
+    }
+
+    // Purpose: Check if a String is Palindrome
+    // Input: String
+    // Output: boolean
+    public static boolean isPalindrome(String s) {
+        int i = 0, j = s.length() - 1;
+
+        while (i < j) {
+            if (s.charAt(i) != s.charAt(j))
+                return false;
+            i++;
+            j--;
+        }
+
+        return true;
+    }
+
+    // Purpose: Character Frequency
+    // Input: String
+    // Output: HashMap<Character,Integer>
+    public static HashMap<Character, Integer> freq(String s) {
+        HashMap<Character, Integer> map = new HashMap<>();
+
+        for (char c : s.toCharArray())
+            map.put(c, map.getOrDefault(c, 0) + 1);
+
+        return map;
+    }
+
+    // Purpose: Count Vowels
+    // Input: String
+    // Output: int
+    public static int vowels(String s) {
+        int cnt = 0;
+
+        for (char c : s.toLowerCase().toCharArray()) {
+            if ("aeiou".indexOf(c) != -1)
+                cnt++;
+        }
+
+        return cnt;
+    }
+
+    // Purpose: Count Consonants
+    // Input: String
+    // Output: int
+    public static int consonants(String s) {
+        int cnt = 0;
+
+        for (char c : s.toLowerCase().toCharArray()) {
+            if (Character.isLetter(c) && "aeiou".indexOf(c) == -1)
+                cnt++;
+        }
+
+        return cnt;
+    }
+     // Purpose: Compute Longest Prefix Suffix (LPS) Array
+        // Input: String pattern
+        // Output: int[]
+        public static int[] lps(String pat) {
+            int n = pat.length();
+            int[] lps = new int[n];
+
+            int len = 0;
+            int i = 1;
+
+            while (i < n) {
+                if (pat.charAt(i) == pat.charAt(len)) {
+                    len++;
+                    lps[i] = len;
+                    i++;
+                } else {
+                    if (len != 0)
+                        len = lps[len - 1];
+                    else
+                        i++;
+                }
+            }
+
+            return lps;
+        }
+        // Purpose: Sort characters in a string
+    // Input: String
+    // Output: String
+    public static String sort(String s) {
+        char[] ch = s.toCharArray();
+        Arrays.sort(ch);
+        return new String(ch);
+    }
+
+    // Purpose: Remove all spaces from a string
+    // Input: String
+    // Output: String
+    public static String removeSpaces(String s) {
+        return s.replace(" ", "");
+    }
+
+    // Purpose: Reverse the order of words
+    // Input: String
+    // Output: String
+    public static String reverseWords(String s) {
+        String[] words = s.trim().split("\\s+");
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = words.length - 1; i >= 0; i--) {
+            sb.append(words[i]);
+            if (i != 0)
+                sb.append(" ");
+        }
+
+        return sb.toString();
+    }
+
+    // Purpose: Toggle case of every alphabet
+    // Input: String
+    // Output: String
+    public static String toggleCase(String s) {
+        StringBuilder sb = new StringBuilder();
+
+        for (char c : s.toCharArray()) {
+            if (Character.isUpperCase(c))
+                sb.append(Character.toLowerCase(c));
+            else if (Character.isLowerCase(c))
+                sb.append(Character.toUpperCase(c));
+            else
+                sb.append(c);
+        }
+
+        return sb.toString();
+    }
+
+    // Purpose: Convert string to uppercase
+    // Input: String
+    // Output: String
+    public static String toUpper(String s) {
+        return s.toUpperCase();
+    }
+
+    // Purpose: Convert string to lowercase
+    // Input: String
+    // Output: String
+    public static String toLower(String s) {
+        return s.toLowerCase();
+    }
+
+    // Purpose: Check whether two strings are anagrams
+    // Input: String first, String second
+    // Output: boolean
+    public static boolean isAnagram(String a, String b) {
+        a = a.replaceAll("\\s+", "").toLowerCase();
+        b = b.replaceAll("\\s+", "").toLowerCase();
+
+        if (a.length() != b.length())
+            return false;
+
+        char[] x = a.toCharArray();
+        char[] y = b.toCharArray();
+
+        Arrays.sort(x);
+        Arrays.sort(y);
+
+        return Arrays.equals(x, y);
+    }
+
+    // Purpose: Count number of words in a string
+    // Input: String
+    // Output: int
+    public static int countWords(String s) {
+        s = s.trim();
+
+        if (s.isEmpty())
+            return 0;
+
+        return s.split("\\s+").length;
+    }
+}
 public static void main(String[] args) {
 
         IO in = new IO();
