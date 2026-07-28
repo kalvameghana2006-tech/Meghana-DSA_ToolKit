@@ -155,6 +155,39 @@ class Main{
         // Purpose: Compute Suffix GCDs | Input: int[] array | Output: long[]
         public static long[] sGcd(int[] a) { int n = a.length; long[] s = new long[n]; if (n == 0) return s; s[n - 1] = a[n - 1]; for (int k = n - 2; k >= 0; k--) s[k] = Mth.gcd(s[k + 1], a[k]); DBG.log("Arr.sGcd Result", s); return s; }
     }
+        // Bit Manipulation Utilities (Class: Bit)
+    static class Bit {
+
+        // Purpose: Check whether ith bit is set | Input: int number, int bitPosition (0-based) | Output: boolean
+        public static boolean get(int n, int i) { boolean res = ((n >> i) & 1) == 1; DBG.log("Bit.get (" + n + "," + i + ")", res); return res; }
+
+        // Purpose: Set ith bit to 1 | Input: int number, int bitPosition (0-based) | Output: int
+        public static int set(int n, int i) { int res = n | (1 << i); DBG.log("Bit.set (" + n + "," + i + ")", res); return res; }
+
+        // Purpose: Clear ith bit to 0 | Input: int number, int bitPosition (0-based) | Output: int
+        public static int clear(int n, int i) { int res = n & ~(1 << i); DBG.log("Bit.clear (" + n + "," + i + ")", res); return res; }
+
+        // Purpose: Toggle ith bit | Input: int number, int bitPosition (0-based) | Output: int
+        public static int toggle(int n, int i) { int res = n ^ (1 << i); DBG.log("Bit.toggle (" + n + "," + i + ")", res); return res; }
+
+        // Purpose: Count number of set bits | Input: int number | Output: int
+        public static int count(int n) { int res = Integer.bitCount(n); DBG.log("Bit.count (" + n + ")", res); return res; }
+
+        // Purpose: Check whether number is a power of two | Input: int number | Output: boolean
+        public static boolean isPow2(int n) { boolean res = n > 0 && (n & (n - 1)) == 0; DBG.log("Bit.isPow2 (" + n + ")", res); return res; }
+
+        // Purpose: Get value of lowest set bit | Input: int number | Output: int
+        public static int lowBit(int n) { int res = n & -n; DBG.log("Bit.lowBit (" + n + ")", res); return res; }
+
+        // Purpose: Remove lowest set bit | Input: int number | Output: int
+        public static int removeLowBit(int n) { int res = n & (n - 1); DBG.log("Bit.removeLowBit (" + n + ")", res); return res; }
+
+        // Purpose: Check whether ith bit is set using mask | Input: int number, int bitPosition (0-based) | Output: boolean
+        public static boolean check(int n, int i) { boolean res = (n & (1 << i)) != 0; DBG.log("Bit.check (" + n + "," + i + ")", res); return res; }
+
+        // Purpose: Generate bitmask with lowest n bits set | Input: int bitCount | Output: int
+        public static int mask(int n) { int res = (1 << n) - 1; DBG.log("Bit.mask (" + n + ")", res); return res; }
+    }
 
 public static void main(String[] args) {
 
